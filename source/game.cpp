@@ -102,7 +102,7 @@ void Game::Init() {
     ResourceManager::LoadTexture("../source/Imposter/sprites/2.png", true, "imposter2");
     ResourceManager::LoadTexture("../source/Imposter/sprites/3.png", true, "imposter3");
 
-    ResourceManager::LoadTexture("../source/Button/texture/kill.png", true, "button");
+    ResourceManager::LoadTexture("../source/Button/texture/button.png", true, "button");
 
     ResourceManager::LoadTexture("../source/PowerUp/texture/coin.jpg", true, "powerups");
 
