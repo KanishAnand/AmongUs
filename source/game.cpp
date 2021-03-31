@@ -54,7 +54,7 @@ void Game::Init() {
 
     // load text renderer
     Text = new TextRenderer(this->Width, this->Height);
-    Text->Load("../source/fonts/antonia_bold.ttf", 28);
+    Text->Load("../source/fonts/antonia_bold.ttf", 26);
 
     TextFinal = new TextRenderer(this->Width, this->Height);
     TextFinal->Load("../source/fonts/antonia_bold.ttf", 50);
@@ -118,7 +118,7 @@ void Game::Init() {
 
     ResourceManager::LoadTexture("../source/Obstacle/texture/bomb.png", true, "obstacles");
 
-    ResourceManager::LoadTexture("../source/EndCell/texture/end.png", true, "endcell");
+    ResourceManager::LoadTexture("../source/EndCell/texture/end.png", false, "endcell");
 }
 
 void Game::Update(float dt) {
@@ -175,10 +175,12 @@ void Game::Render() {
 
     if (this->State == GAME_ACTIVE && this->totalTime == 0) {
         this->State = GAME_LOOSE;
+        return;
     }
 
     if (this->State == GAME_ACTIVE && this->playerHealth == 0) {
         this->State = GAME_LOOSE;
+        return;
     }
 
     if (this->State == GAME_ACTIVE && Imposter->active && this->check_collision(Player->current_coordinates, Player->PLAYER_HEIGTH, Player->PLAYER_WIDTH, Imposter->current_coordinates, Imposter->IMPOSTER_HEIGHT, Imposter->IMPOSTER_WIDTH)) {
@@ -186,7 +188,6 @@ void Game::Render() {
     }
 
     if (this->State == GAME_ACTIVE && Button->active && this->check_collision(Player->current_coordinates, Player->PLAYER_HEIGTH, Player->PLAYER_WIDTH, Button->coordinates, Button->OBJECT_HEIGHT, Button->OBJECT_WIDTH)) {
-        // this->State = GAME_VAP;
         this->tasksCompleted++;
         Button->active = false;
         Imposter->active = false;
@@ -256,7 +257,7 @@ void Game::Render() {
     // Heads Up Display
     auto texture_hud = ResourceManager::GetTexture("hud");
     HUD->DrawHUD(texture_hud);
-    float start = 0, offset = 10.0, x = 20.0;
+    float start = 0, offset = 10.0, x = 30.0;
     string healthStatus = "Health: " + to_string(this->playerHealth);
     Text->RenderText(healthStatus, x, start + 2 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
     string taskStatus = "Tasks Completed: " + to_string(this->tasksCompleted) + "/" + to_string(this->totalTasks);

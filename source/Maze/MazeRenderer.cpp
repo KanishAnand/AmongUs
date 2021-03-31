@@ -3,7 +3,7 @@
 #include "template.h"
 
 MazeRenderer::MazeRenderer(Shader &shader) {
-    this->Model = glm::translate(this->Model, glm::vec3(-0.75f, -0.55f, 0.0f));
+    this->Model = glm::translate(this->Model, glm::vec3(-0.75f, -0.65f, 0.0f));
     this->shader = shader;
     this->maze.resize(this->MAZE_HEIGHT, vector<MazeCell>(this->MAZE_WIDTH));
 

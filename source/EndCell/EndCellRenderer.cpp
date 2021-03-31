@@ -16,10 +16,10 @@ void EndCellRenderer::initRenderData() {
     unsigned int VBO;
 
     float vertices[] = {
-        this->coordinates.first, this->coordinates.second, 0.0f, 0.0f,
-        this->coordinates.first + OBJECT_WIDTH, this->coordinates.second, 1.0f, 0.0f,
-        this->coordinates.first + OBJECT_WIDTH, this->coordinates.second + OBJECT_HEIGHT, 1.0f, 1.0f,
-        this->coordinates.first, this->coordinates.second + OBJECT_HEIGHT, 0.0f, 1.0f};
+        this->coordinates.first, this->coordinates.second, 0.0f, 1.0f,
+        this->coordinates.first + OBJECT_WIDTH, this->coordinates.second, 1.0f, 1.0f,
+        this->coordinates.first + OBJECT_WIDTH, this->coordinates.second + OBJECT_HEIGHT, 1.0f, 0.0f,
+        this->coordinates.first, this->coordinates.second + OBJECT_HEIGHT, 0.0f, 0.0f};
 
     glGenVertexArrays(1, &this->VAO);
     glGenBuffers(1, &VBO);
