@@ -22,6 +22,7 @@ PowerEnablerRenderer *PowerEnabler;
 PowerUpRenderer *PowerUps[3];
 ObstacleRenderer *Obstacles[2];
 EndCellRenderer *EndCell;
+TextRenderer *TextFinal;
 
 Game::Game(unsigned int width, unsigned int height)
     : State(GAME_ACTIVE), Keys(), Width(width), Height(height) {
@@ -54,6 +55,9 @@ void Game::Init() {
     // load text renderer
     Text = new TextRenderer(this->Width, this->Height);
     Text->Load("../source/fonts/antonia_bold.ttf", 28);
+
+    TextFinal = new TextRenderer(this->Width, this->Height);
+    TextFinal->Load("../source/fonts/antonia_bold.ttf", 50);
 
     // set render-specific controls
     auto shader_maze = ResourceManager::GetShader("maze");
@@ -145,6 +149,7 @@ void Game::ProcessInput(float dt) {
 
 void Game::Render() {
     if (this->State == GAME_LOOSE) {
+        TextFinal->RenderText("You Lose :(", this->Width / 4, this->Height / 2.9, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
         return;
     }
 

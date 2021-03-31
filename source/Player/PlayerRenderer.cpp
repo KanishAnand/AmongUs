@@ -1,7 +1,7 @@
 #include "PlayerRenderer.h"
 
 PlayerRenderer::PlayerRenderer(Shader &shader, glm::mat4 maze_modelmat) {
-    this->start_coordinates = {0.025, 0.03};
+    this->start_coordinates = {0.001, 0.001};
     this->current_coordinates = start_coordinates;
     this->Model = maze_modelmat;
     this->shader = shader;
@@ -39,13 +39,14 @@ void PlayerRenderer::DrawPlayer(Texture2D &texture) {
     this->shader.Use();
 
     glm::mat4 model = this->Model;
-    glm::mat4 rot = glm::mat4(1.0f);
 
     if (this->flip) {
-        // rot = glm::rotate(rot, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::translate(model, glm::vec3(0.5f * this->PLAYER_WIDTH, 0.5f * this->PLAYER_HEIGTH, 0.0f));    // move origin of rotation to center of quad
+        model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));                            // then rotate
+        model = glm::translate(model, glm::vec3(-0.5f * this->PLAYER_WIDTH, -0.5f * this->PLAYER_HEIGTH, 0.0f));  // move origin back
     }
 
-    this->shader.SetMatrix4("model", model * rot);
+    this->shader.SetMatrix4("model", model);
 
     glActiveTexture(GL_TEXTURE0);
     texture.Bind();

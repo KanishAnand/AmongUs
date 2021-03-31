@@ -1,9 +1,10 @@
 #include "ImposterRenderer.h"
 
 ImposterRenderer::ImposterRenderer(Shader &shader, pair<float, float> source, glm::mat4 maze_modelmat) {
-    this->start_coordinates = {source.first + 0.025, source.second + 0.03};
-    this->current_coordinates = start_coordinates;
+    this->start_coordinates = {0.0f, 0.0f};
+    this->current_coordinates = {source.first, source.second};
     this->Model = maze_modelmat;
+    this->Model = glm::translate(this->Model, glm::vec3(current_coordinates.first, current_coordinates.second, 0.0f));
     this->shader = shader;
     this->initRenderData();
 }
@@ -40,13 +41,14 @@ void ImposterRenderer::DrawImposter(Texture2D &texture) {
     this->shader.Use();
 
     glm::mat4 model = this->Model;
-    glm::mat4 rot = glm::mat4(1.0f);
 
     if (this->flip) {
-        // rot = glm::rotate(rot, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::translate(model, glm::vec3(0.5f * this->IMPOSTER_WIDTH, 0.5f * this->IMPOSTER_HEIGHT, 0.0f));    // move origin of rotation to center of quad
+        model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));                                // then rotate
+        model = glm::translate(model, glm::vec3(-0.5f * this->IMPOSTER_WIDTH, -0.5f * this->IMPOSTER_HEIGHT, 0.0f));  // move origin back
     }
 
-    this->shader.SetMatrix4("model", model * rot);
+    this->shader.SetMatrix4("model", model);
 
     glActiveTexture(GL_TEXTURE0);
     texture.Bind();
@@ -89,7 +91,6 @@ void ImposterRenderer::move(pair<float, float> player_coord, float room_length, 
     }
 
     this->current_move = move;
-    // cout << src << " " << des << endl;
 
     if (move == UP) {
         this->current_coordinates.second += IMPOSTER_SPEED;
