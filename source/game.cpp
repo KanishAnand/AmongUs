@@ -6,6 +6,7 @@
 #include "Maze/MazeRenderer.h"
 #include "Player/PlayerRenderer.h"
 #include "PowerEnabler/PowerEnablerRenderer.h"
+#include "PowerUp/PowerUpRenderer.h"
 #include "TextRenderer.h"
 #include "resource_manager.h"
 
@@ -16,6 +17,7 @@ TextRenderer *Text;
 HUDRenderer *HUD;
 ButtonRenderer *Button;
 PowerEnablerRenderer *PowerEnabler;
+PowerUpRenderer *PowerUps[3];
 
 Game::Game(unsigned int width, unsigned int height)
     : State(GAME_ACTIVE), Keys(), Width(width), Height(height) {
@@ -33,11 +35,13 @@ void Game::Init() {
     ResourceManager::LoadShader("../source/HUD/shaders/vertex_shader.vert", "../source/HUD/shaders/fragment_shader.frag", nullptr, "hud");
     ResourceManager::LoadShader("../source/Button/shaders/vertex_shader.vert", "../source/Button/shaders/fragment_shader.frag", nullptr, "button");
     ResourceManager::LoadShader("../source/PowerEnabler/shaders/vertex_shader.vert", "../source/PowerEnabler/shaders/fragment_shader.frag", nullptr, "powerenabler");
+    ResourceManager::LoadShader("../source/PowerUp/shaders/vertex_shader.vert", "../source/PowerUp/shaders/fragment_shader.frag", nullptr, "powerups");
 
     ResourceManager::GetShader("player").Use().SetInteger("image", 0);
     ResourceManager::GetShader("imposter").Use().SetInteger("image", 0);
     ResourceManager::GetShader("hud").Use().SetInteger("image", 0);
     ResourceManager::GetShader("button").Use().SetInteger("image", 0);
+    ResourceManager::GetShader("powerups").Use().SetInteger("image", 0);
 
     // load text renderer
     Text = new TextRenderer(this->Width, this->Height);
@@ -62,6 +66,11 @@ void Game::Init() {
     auto shader_powerenabler = ResourceManager::GetShader("powerenabler");
     PowerEnabler = new PowerEnablerRenderer(shader_powerenabler, Maze->Model, Maze->powerenabler_coord);
 
+    auto shader_powerup = ResourceManager::GetShader("powerups");
+    for (int i = 0; i < Maze->totalPowerups; i++) {
+        PowerUps[i] = new PowerUpRenderer(shader_button, Maze->Model, Maze->powerup_coord[i]);
+    }
+
     //Load texture
     ResourceManager::LoadTexture("../source/HUD/texture/download.jpg", true, "hud");
     ResourceManager::LoadTexture("../source/Player/sprites/0.png", true, "player0");
@@ -84,6 +93,8 @@ void Game::Init() {
     ResourceManager::LoadTexture("../source/Player/sprites/5.png", true, "imposter5");
 
     ResourceManager::LoadTexture("../source/Button/texture/kill.png", true, "button");
+
+    ResourceManager::LoadTexture("../source/PowerUp/texture/coin.jpg", true, "powerups");
 }
 
 void Game::Update(float dt) {
@@ -122,8 +133,9 @@ void Game::Render() {
     }
 
     if (this->State == GAME_ACTIVE && Imposter->active && this->check_collision(Player->current_coordinates, Player->PLAYER_HEIGTH, Player->PLAYER_WIDTH, Imposter->current_coordinates, Imposter->IMPOSTER_HEIGHT, Imposter->IMPOSTER_WIDTH)) {
-        this->State = GAME_LOOSE;
-        Button->active = false;
+        //////////////////////??????????????????????????????????//
+        // this->State = GAME_LOOSE;
+        // Button->active = false;
     }
 
     if (this->State == GAME_ACTIVE && Button->active && this->check_collision(Player->current_coordinates, Player->PLAYER_HEIGTH, Player->PLAYER_WIDTH, Button->coordinates, Button->OBJECT_HEIGHT, Button->OBJECT_WIDTH)) {
@@ -135,6 +147,29 @@ void Game::Render() {
 
     if (this->State == GAME_ACTIVE && PowerEnabler->active && this->check_collision(Player->current_coordinates, Player->PLAYER_HEIGTH, Player->PLAYER_WIDTH, PowerEnabler->coordinates, PowerEnabler->OBJECT_HEIGHT, PowerEnabler->OBJECT_WIDTH)) {
         PowerEnabler->active = false;
+        for (int i = 0; i < Maze->totalPowerups; i++) {
+            PowerUps[i]->active = true;
+        }
+    }
+
+    int flag = 1;
+    for (int i = 0; i < Maze->totalPowerups; i++) {
+        if (PowerUps[i]->active && this->check_collision(Player->current_coordinates, Player->PLAYER_HEIGTH, Player->PLAYER_WIDTH, PowerUps[i]->coordinates, PowerUps[i]->OBJECT_HEIGHT, PowerUps[i]->OBJECT_WIDTH)) {
+            PowerUps[i]->active = false;
+            this->playerHealth += PowerUps[i]->healthInc;
+            flag = 0;
+        }
+    }
+    if (flag == 0) {
+        int tmp = 1;
+        for (int i = 0; i < Maze->totalPowerups; i++) {
+            if (PowerUps[i]->active) {
+                tmp = 0;
+            }
+        }
+        if (tmp) {
+            this->tasksCompleted++;
+        }
     }
 
     Maze->DrawMaze();
@@ -158,7 +193,8 @@ void Game::Render() {
     auto texture_hud = ResourceManager::GetTexture("hud");
     HUD->DrawHUD(texture_hud);
     float start = 0, offset = 10.0, x = 20.0;
-    Text->RenderText("Player Health: ", x, start + 2 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
+    string healthStatus = "Player Health: " + to_string(this->playerHealth);
+    Text->RenderText(healthStatus, x, start + 2 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
     string taskStatus = "Tasks: " + to_string(this->tasksCompleted) + "/" + to_string(this->totalTasks);
     Text->RenderText(&taskStatus[0], x, start + 6 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
     Text->RenderText("Lights: On", x, start + 10 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
@@ -173,6 +209,13 @@ void Game::Render() {
 
     if (PowerEnabler->active) {
         PowerEnabler->DrawPowerEnabler();
+    }
+
+    for (int i = 0; i < Maze->totalPowerups; i++) {
+        if (PowerUps[i]->active) {
+            auto texture_powerups = ResourceManager::GetTexture("powerups");
+            PowerUps[i]->DrawPowerUp(texture_powerups);
+        }
     }
 }
 

@@ -11,6 +11,8 @@ MazeRenderer::MazeRenderer(Shader &shader) {
     this->dist.resize(mx, vector<int>(mx, INF));
     this->nearestCell.resize(mx, vector<Direction>(mx, NONE));
 
+    this->powerup_coord.resize(this->totalPowerups);
+
     for (int i = 0; i < mx; i++) {
         this->dist[i][i] = 0;
     }
@@ -231,6 +233,9 @@ void MazeRenderer::opencloseGates() {
     this->button_coord = {float(reachables[0].second) * this->ROOM_LENGTH, float(reachables[0].first) * this->ROOM_LENGTH};
     this->imposter_coord = {float(reachables[1].second) * this->ROOM_LENGTH, float(reachables[1].first) * this->ROOM_LENGTH};
     this->powerenabler_coord = {float(reachables[2].second) * this->ROOM_LENGTH, float(reachables[2].first) * this->ROOM_LENGTH};
+    for (int i = 0; i < this->totalPowerups; i++) {
+        this->powerup_coord[i] = {float(reachables[3 + i].second) * this->ROOM_LENGTH, float(reachables[3 + i].first) * this->ROOM_LENGTH};
+    }
 }
 
 void MazeRenderer::openrightGate(int &row, int &col) {
