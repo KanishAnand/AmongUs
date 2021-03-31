@@ -4,6 +4,7 @@
 #include "HUD/HUDRenderer.h"
 #include "Imposter/ImposterRenderer.h"
 #include "Maze/MazeRenderer.h"
+#include "Obstacle/ObstacleRenderer.h"
 #include "Player/PlayerRenderer.h"
 #include "PowerEnabler/PowerEnablerRenderer.h"
 #include "PowerUp/PowerUpRenderer.h"
@@ -18,6 +19,7 @@ HUDRenderer *HUD;
 ButtonRenderer *Button;
 PowerEnablerRenderer *PowerEnabler;
 PowerUpRenderer *PowerUps[3];
+ObstacleRenderer *Obstacles[2];
 
 Game::Game(unsigned int width, unsigned int height)
     : State(GAME_ACTIVE), Keys(), Width(width), Height(height) {
@@ -36,12 +38,14 @@ void Game::Init() {
     ResourceManager::LoadShader("../source/Button/shaders/vertex_shader.vert", "../source/Button/shaders/fragment_shader.frag", nullptr, "button");
     ResourceManager::LoadShader("../source/PowerEnabler/shaders/vertex_shader.vert", "../source/PowerEnabler/shaders/fragment_shader.frag", nullptr, "powerenabler");
     ResourceManager::LoadShader("../source/PowerUp/shaders/vertex_shader.vert", "../source/PowerUp/shaders/fragment_shader.frag", nullptr, "powerups");
+    ResourceManager::LoadShader("../source/Obstacle/shaders/vertex_shader.vert", "../source/Obstacle/shaders/fragment_shader.frag", nullptr, "obstacle");
 
     ResourceManager::GetShader("player").Use().SetInteger("image", 0);
     ResourceManager::GetShader("imposter").Use().SetInteger("image", 0);
     ResourceManager::GetShader("hud").Use().SetInteger("image", 0);
     ResourceManager::GetShader("button").Use().SetInteger("image", 0);
     ResourceManager::GetShader("powerups").Use().SetInteger("image", 0);
+    ResourceManager::GetShader("obstacle").Use().SetInteger("image", 0);
 
     // load text renderer
     Text = new TextRenderer(this->Width, this->Height);
@@ -68,7 +72,12 @@ void Game::Init() {
 
     auto shader_powerup = ResourceManager::GetShader("powerups");
     for (int i = 0; i < Maze->totalPowerups; i++) {
-        PowerUps[i] = new PowerUpRenderer(shader_button, Maze->Model, Maze->powerup_coord[i]);
+        PowerUps[i] = new PowerUpRenderer(shader_powerup, Maze->Model, Maze->powerup_coord[i]);
+    }
+
+    auto shader_obstacle = ResourceManager::GetShader("obstacle");
+    for (int i = 0; i < Maze->totalObstacles; i++) {
+        Obstacles[i] = new ObstacleRenderer(shader_obstacle, Maze->Model, Maze->obstacle_coord[i]);
     }
 
     //Load texture
@@ -95,6 +104,8 @@ void Game::Init() {
     ResourceManager::LoadTexture("../source/Button/texture/kill.png", true, "button");
 
     ResourceManager::LoadTexture("../source/PowerUp/texture/coin.jpg", true, "powerups");
+
+    ResourceManager::LoadTexture("../source/Obstacle/texture/bomb.png", true, "obstacles");
 }
 
 void Game::Update(float dt) {
@@ -150,6 +161,9 @@ void Game::Render() {
         for (int i = 0; i < Maze->totalPowerups; i++) {
             PowerUps[i]->active = true;
         }
+        for (int i = 0; i < Maze->totalObstacles; i++) {
+            Obstacles[i]->active = true;
+        }
     }
 
     int flag = 1;
@@ -160,6 +174,7 @@ void Game::Render() {
             flag = 0;
         }
     }
+
     if (flag == 0) {
         int tmp = 1;
         for (int i = 0; i < Maze->totalPowerups; i++) {
@@ -169,6 +184,13 @@ void Game::Render() {
         }
         if (tmp) {
             this->tasksCompleted++;
+        }
+    }
+
+    for (int i = 0; i < Maze->totalObstacles; i++) {
+        if (Obstacles[i]->active && this->check_collision(Player->current_coordinates, Player->PLAYER_HEIGTH, Player->PLAYER_WIDTH, Obstacles[i]->coordinates, Obstacles[i]->OBJECT_HEIGHT, Obstacles[i]->OBJECT_WIDTH)) {
+            Obstacles[i]->active = false;
+            this->playerHealth -= Obstacles[i]->healthDec;
         }
     }
 
@@ -215,6 +237,13 @@ void Game::Render() {
         if (PowerUps[i]->active) {
             auto texture_powerups = ResourceManager::GetTexture("powerups");
             PowerUps[i]->DrawPowerUp(texture_powerups);
+        }
+    }
+
+    for (int i = 0; i < Maze->totalObstacles; i++) {
+        if (Obstacles[i]->active) {
+            auto texture_obstacle = ResourceManager::GetTexture("obstacles");
+            Obstacles[i]->DrawObstacle(texture_obstacle);
         }
     }
 }

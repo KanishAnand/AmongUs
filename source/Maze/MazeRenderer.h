@@ -13,9 +13,9 @@ class MazeRenderer {
     const int MAZE_WIDTH = 10;
     const float ROOM_LENGTH = 0.15;
 
-    int totalPowerups = 3, obstacles = 2;
+    int totalPowerups = 3, totalObstacles = 2;
 
-    vector<pair<float, float>> powerup_coord;
+    vector<pair<float, float>> powerup_coord, obstacle_coord;
     pair<float, float> farthest_coord, button_coord, imposter_coord, powerenabler_coord;
     glm::mat4 Model = glm::mat4(1.0f);
 
