@@ -1,6 +1,7 @@
 #include "game.h"
 
 #include "Button/ButtonRenderer.h"
+#include "EndCell/EndCellRenderer.h"
 #include "HUD/HUDRenderer.h"
 #include "Imposter/ImposterRenderer.h"
 #include "Maze/MazeRenderer.h"
@@ -20,6 +21,7 @@ ButtonRenderer *Button;
 PowerEnablerRenderer *PowerEnabler;
 PowerUpRenderer *PowerUps[3];
 ObstacleRenderer *Obstacles[2];
+EndCellRenderer *EndCell;
 
 Game::Game(unsigned int width, unsigned int height)
     : State(GAME_ACTIVE), Keys(), Width(width), Height(height) {
@@ -39,6 +41,7 @@ void Game::Init() {
     ResourceManager::LoadShader("../source/PowerEnabler/shaders/vertex_shader.vert", "../source/PowerEnabler/shaders/fragment_shader.frag", nullptr, "powerenabler");
     ResourceManager::LoadShader("../source/PowerUp/shaders/vertex_shader.vert", "../source/PowerUp/shaders/fragment_shader.frag", nullptr, "powerups");
     ResourceManager::LoadShader("../source/Obstacle/shaders/vertex_shader.vert", "../source/Obstacle/shaders/fragment_shader.frag", nullptr, "obstacle");
+    ResourceManager::LoadShader("../source/EndCell/shaders/vertex_shader.vert", "../source/EndCell/shaders/fragment_shader.frag", nullptr, "endcell");
 
     ResourceManager::GetShader("player").Use().SetInteger("image", 0);
     ResourceManager::GetShader("imposter").Use().SetInteger("image", 0);
@@ -46,6 +49,7 @@ void Game::Init() {
     ResourceManager::GetShader("button").Use().SetInteger("image", 0);
     ResourceManager::GetShader("powerups").Use().SetInteger("image", 0);
     ResourceManager::GetShader("obstacle").Use().SetInteger("image", 0);
+    ResourceManager::GetShader("endcell").Use().SetInteger("image", 0);
 
     // load text renderer
     Text = new TextRenderer(this->Width, this->Height);
@@ -80,6 +84,9 @@ void Game::Init() {
         Obstacles[i] = new ObstacleRenderer(shader_obstacle, Maze->Model, Maze->obstacle_coord[i]);
     }
 
+    auto shader_endcell = ResourceManager::GetShader("endcell");
+    EndCell = new EndCellRenderer(shader_endcell, Maze->Model, Maze->farthest_coord);
+
     //Load texture
     ResourceManager::LoadTexture("../source/HUD/texture/download.jpg", true, "hud");
     ResourceManager::LoadTexture("../source/Player/sprites/0.png", true, "player0");
@@ -106,6 +113,8 @@ void Game::Init() {
     ResourceManager::LoadTexture("../source/PowerUp/texture/coin.jpg", true, "powerups");
 
     ResourceManager::LoadTexture("../source/Obstacle/texture/bomb.png", true, "obstacles");
+
+    ResourceManager::LoadTexture("../source/EndCell/texture/end.png", true, "endcell");
 }
 
 void Game::Update(float dt) {
@@ -139,6 +148,10 @@ void Game::Render() {
         return;
     }
 
+    if (this->State == GAME_WIN) {
+        return;
+    }
+
     if (this->State == GAME_ACTIVE && this->totalTime == 0) {
         this->State = GAME_LOOSE;
     }
@@ -156,6 +169,12 @@ void Game::Render() {
         this->tasksCompleted++;
         Button->active = false;
         Imposter->active = false;
+    }
+
+    if (this->State == GAME_ACTIVE && this->check_collision(Player->current_coordinates, Player->PLAYER_HEIGTH, Player->PLAYER_WIDTH, EndCell->coordinates, EndCell->OBJECT_HEIGHT, EndCell->OBJECT_WIDTH)) {
+        if (this->tasksCompleted == 2) {
+            this->State = GAME_WIN;
+        }
     }
 
     if (this->State == GAME_ACTIVE && PowerEnabler->active && this->check_collision(Player->current_coordinates, Player->PLAYER_HEIGTH, Player->PLAYER_WIDTH, PowerEnabler->coordinates, PowerEnabler->OBJECT_HEIGHT, PowerEnabler->OBJECT_WIDTH)) {
@@ -248,6 +267,9 @@ void Game::Render() {
             Obstacles[i]->DrawObstacle(texture_obstacle);
         }
     }
+
+    auto texture_endcell = ResourceManager::GetTexture("endcell");
+    EndCell->DrawEndCell(texture_endcell);
 }
 
 bool Game::check_collision(pair<float, float> &coord1, float h1, float w1, pair<float, float> &coord2, float h2, float w2) {

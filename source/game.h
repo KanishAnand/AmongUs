@@ -14,8 +14,6 @@
 // Represents the current state of the game
 enum GameState {
     GAME_ACTIVE,
-    GAME_VAP,
-    GAME_MENU,
     GAME_WIN,
     GAME_LOOSE
 };
