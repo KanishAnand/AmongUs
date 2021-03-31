@@ -97,20 +97,10 @@ void Game::Init() {
     ResourceManager::LoadTexture("../source/Player/sprites/1.png", true, "player1");
     ResourceManager::LoadTexture("../source/Player/sprites/2.png", true, "player2");
     ResourceManager::LoadTexture("../source/Player/sprites/3.png", true, "player3");
-    ResourceManager::LoadTexture("../source/Player/sprites/4.png", true, "player4");
-    ResourceManager::LoadTexture("../source/Player/sprites/5.png", true, "player5");
-    ResourceManager::LoadTexture("../source/Player/sprites/6.png", true, "player6");
-    ResourceManager::LoadTexture("../source/Player/sprites/7.png", true, "player7");
-    ResourceManager::LoadTexture("../source/Player/sprites/8.png", true, "player8");
-    ResourceManager::LoadTexture("../source/Player/sprites/9.png", true, "player9");
-    ResourceManager::LoadTexture("../source/Player/sprites/10.png", true, "player10");
-    ResourceManager::LoadTexture("../source/Player/sprites/11.png", true, "player11");
-    ResourceManager::LoadTexture("../source/Player/sprites/0.png", true, "imposter0");
-    ResourceManager::LoadTexture("../source/Player/sprites/1.png", true, "imposter1");
-    ResourceManager::LoadTexture("../source/Player/sprites/2.png", true, "imposter2");
-    ResourceManager::LoadTexture("../source/Player/sprites/3.png", true, "imposter3");
-    ResourceManager::LoadTexture("../source/Player/sprites/4.png", true, "imposter4");
-    ResourceManager::LoadTexture("../source/Player/sprites/5.png", true, "imposter5");
+    ResourceManager::LoadTexture("../source/Imposter/sprites/0.png", true, "imposter0");
+    ResourceManager::LoadTexture("../source/Imposter/sprites/1.png", true, "imposter1");
+    ResourceManager::LoadTexture("../source/Imposter/sprites/2.png", true, "imposter2");
+    ResourceManager::LoadTexture("../source/Imposter/sprites/3.png", true, "imposter3");
 
     ResourceManager::LoadTexture("../source/Button/texture/kill.png", true, "button");
 
@@ -239,13 +229,13 @@ void Game::Render() {
 
     Maze->DrawMaze();
 
-    int no = this->countPlayer % 12;
+    int no = this->countPlayer % 4;
     string st = "player" + to_string(no);
     auto texture_player = ResourceManager::GetTexture(&st[0]);
     Player->DrawPlayer(texture_player);
 
     if (Imposter->active) {
-        int no2 = this->countImposter % 6;
+        int no2 = this->countImposter % 4;
         string st2 = "imposter" + to_string(no2);
         auto texture_imposter = ResourceManager::GetTexture(&st2[0]);
         Imposter->DrawImposter(texture_imposter);
