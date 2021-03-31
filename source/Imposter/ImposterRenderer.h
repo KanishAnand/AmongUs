@@ -9,6 +9,7 @@
 class ImposterRenderer {
    public:
     bool flip = 1, active = true;
+    int healthDec = 1;
     float IMPOSTER_SPEED = 0.005;
     float IMPOSTER_HEIGHT = 0.1;
     float IMPOSTER_WIDTH = 0.1;

@@ -143,10 +143,12 @@ void Game::Render() {
         this->State = GAME_LOOSE;
     }
 
+    if (this->State == GAME_ACTIVE && this->playerHealth == 0) {
+        this->State = GAME_LOOSE;
+    }
+
     if (this->State == GAME_ACTIVE && Imposter->active && this->check_collision(Player->current_coordinates, Player->PLAYER_HEIGTH, Player->PLAYER_WIDTH, Imposter->current_coordinates, Imposter->IMPOSTER_HEIGHT, Imposter->IMPOSTER_WIDTH)) {
-        //////////////////////??????????????????????????????????//
-        // this->State = GAME_LOOSE;
-        // Button->active = false;
+        this->playerHealth -= Imposter->healthDec;
     }
 
     if (this->State == GAME_ACTIVE && Button->active && this->check_collision(Player->current_coordinates, Player->PLAYER_HEIGTH, Player->PLAYER_WIDTH, Button->coordinates, Button->OBJECT_HEIGHT, Button->OBJECT_WIDTH)) {
