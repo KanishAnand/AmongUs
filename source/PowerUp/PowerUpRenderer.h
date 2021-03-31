@@ -9,8 +9,8 @@ class PowerUpRenderer {
    public:
     bool active = false;
     int healthInc = 20;
-    float OBJECT_HEIGHT = 0.1;
-    float OBJECT_WIDTH = 0.1;
+    float OBJECT_HEIGHT = 0.08;
+    float OBJECT_WIDTH = 0.08;
     glm::mat4 Model = glm::mat4(1.0f);
     pair<float, float> coordinates;
 
