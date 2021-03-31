@@ -5,6 +5,7 @@
 #include "Imposter/ImposterRenderer.h"
 #include "Maze/MazeRenderer.h"
 #include "Player/PlayerRenderer.h"
+#include "PowerEnabler/PowerEnablerRenderer.h"
 #include "TextRenderer.h"
 #include "resource_manager.h"
 
@@ -14,6 +15,7 @@ MazeRenderer *Maze;
 TextRenderer *Text;
 HUDRenderer *HUD;
 ButtonRenderer *Button;
+PowerEnablerRenderer *PowerEnabler;
 
 Game::Game(unsigned int width, unsigned int height)
     : State(GAME_ACTIVE), Keys(), Width(width), Height(height) {
@@ -30,6 +32,7 @@ void Game::Init() {
     ResourceManager::LoadShader("../source/Imposter/shaders/vertex_shader.vert", "../source/Imposter/shaders/fragment_shader.frag", nullptr, "imposter");
     ResourceManager::LoadShader("../source/HUD/shaders/vertex_shader.vert", "../source/HUD/shaders/fragment_shader.frag", nullptr, "hud");
     ResourceManager::LoadShader("../source/Button/shaders/vertex_shader.vert", "../source/Button/shaders/fragment_shader.frag", nullptr, "button");
+    ResourceManager::LoadShader("../source/PowerEnabler/shaders/vertex_shader.vert", "../source/PowerEnabler/shaders/fragment_shader.frag", nullptr, "powerenabler");
 
     ResourceManager::GetShader("player").Use().SetInteger("image", 0);
     ResourceManager::GetShader("imposter").Use().SetInteger("image", 0);
@@ -55,6 +58,9 @@ void Game::Init() {
 
     auto shader_button = ResourceManager::GetShader("button");
     Button = new ButtonRenderer(shader_button, Maze->Model, Maze->button_coord);
+
+    auto shader_powerenabler = ResourceManager::GetShader("powerenabler");
+    PowerEnabler = new PowerEnablerRenderer(shader_powerenabler, Maze->Model, Maze->powerenabler_coord);
 
     //Load texture
     ResourceManager::LoadTexture("../source/HUD/texture/download.jpg", true, "hud");
@@ -107,6 +113,10 @@ void Game::ProcessInput(float dt) {
 }
 
 void Game::Render() {
+    if (this->State == GAME_LOOSE) {
+        return;
+    }
+
     if (this->State == GAME_ACTIVE && this->totalTime == 0) {
         this->State = GAME_LOOSE;
     }
@@ -123,40 +133,46 @@ void Game::Render() {
         Imposter->active = false;
     }
 
-    if (this->State != GAME_LOOSE) {
-        Maze->DrawMaze();
+    if (this->State == GAME_ACTIVE && PowerEnabler->active && this->check_collision(Player->current_coordinates, Player->PLAYER_HEIGTH, Player->PLAYER_WIDTH, PowerEnabler->coordinates, PowerEnabler->OBJECT_HEIGHT, PowerEnabler->OBJECT_WIDTH)) {
+        PowerEnabler->active = false;
+    }
 
-        int no = this->countPlayer % 12;
-        string st = "player" + to_string(no);
-        auto texture_player = ResourceManager::GetTexture(&st[0]);
-        Player->DrawPlayer(texture_player);
+    Maze->DrawMaze();
 
-        if (Imposter->active) {
-            int no2 = this->countImposter % 6;
-            string st2 = "imposter" + to_string(no2);
-            auto texture_imposter = ResourceManager::GetTexture(&st2[0]);
-            Imposter->DrawImposter(texture_imposter);
+    int no = this->countPlayer % 12;
+    string st = "player" + to_string(no);
+    auto texture_player = ResourceManager::GetTexture(&st[0]);
+    Player->DrawPlayer(texture_player);
 
-            Imposter->move(Player->current_coordinates, Maze->ROOM_LENGTH, Maze->MAZE_WIDTH, Maze->nearestCell);
-            this->countImposter++;
-        }
+    if (Imposter->active) {
+        int no2 = this->countImposter % 6;
+        string st2 = "imposter" + to_string(no2);
+        auto texture_imposter = ResourceManager::GetTexture(&st2[0]);
+        Imposter->DrawImposter(texture_imposter);
 
-        // Heads Up Display
-        auto texture_hud = ResourceManager::GetTexture("hud");
-        HUD->DrawHUD(texture_hud);
-        float start = 0, offset = 10.0, x = 20.0;
-        Text->RenderText("Player Health: ", x, start + 2 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
-        string taskStatus = "Tasks: " + to_string(this->tasksCompleted) + "/" + to_string(this->totalTasks);
-        Text->RenderText(&taskStatus[0], x, start + 6 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
-        Text->RenderText("Lights: On", x, start + 10 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
-        string timeStatus = "Time: " + to_string(this->totalTime);
-        Text->RenderText(timeStatus, x, start + 14 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
+        Imposter->move(Player->current_coordinates, Maze->ROOM_LENGTH, Maze->MAZE_WIDTH, Maze->nearestCell);
+        this->countImposter++;
+    }
 
-        //vapourizer button
-        if (Button->active) {
-            auto texture_button = ResourceManager::GetTexture("button");
-            Button->DrawButton(texture_button);
-        }
+    // Heads Up Display
+    auto texture_hud = ResourceManager::GetTexture("hud");
+    HUD->DrawHUD(texture_hud);
+    float start = 0, offset = 10.0, x = 20.0;
+    Text->RenderText("Player Health: ", x, start + 2 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
+    string taskStatus = "Tasks: " + to_string(this->tasksCompleted) + "/" + to_string(this->totalTasks);
+    Text->RenderText(&taskStatus[0], x, start + 6 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
+    Text->RenderText("Lights: On", x, start + 10 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
+    string timeStatus = "Time: " + to_string(this->totalTime);
+    Text->RenderText(timeStatus, x, start + 14 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
+
+    //vapourizer button
+    if (Button->active) {
+        auto texture_button = ResourceManager::GetTexture("button");
+        Button->DrawButton(texture_button);
+    }
+
+    if (PowerEnabler->active) {
+        PowerEnabler->DrawPowerEnabler();
     }
 }
 

@@ -1,11 +1,11 @@
-#ifndef BUTTONRENDERER_H
-#define BUTTONRENDERER_H
+#ifndef POWERENABLERRENDERER_H
+#define POWERENABLERRENDERER_H
 
 #include "shader_src/shader.h"
 #include "template.h"
 #include "texture_src/texture.h"
 
-class ButtonRenderer {
+class PowerEnablerRenderer {
    public:
     bool active = true;
     float OBJECT_HEIGHT = 0.1;
@@ -14,11 +14,11 @@ class ButtonRenderer {
     pair<float, float> coordinates;
 
     // Constructor
-    ButtonRenderer(Shader &shader, glm::mat4 maze_modelmat, pair<float, float> button_coord);
+    PowerEnablerRenderer(Shader &shader, glm::mat4 maze_modelmat, pair<float, float> PowerEnabler_coord);
     // Destructor
-    ~ButtonRenderer();
+    ~PowerEnablerRenderer();
 
-    void DrawButton(Texture2D &texture);
+    void DrawPowerEnabler();
 
    private:
     // Render state

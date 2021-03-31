@@ -230,6 +230,7 @@ void MazeRenderer::opencloseGates() {
 
     this->button_coord = {float(reachables[0].second) * this->ROOM_LENGTH, float(reachables[0].first) * this->ROOM_LENGTH};
     this->imposter_coord = {float(reachables[1].second) * this->ROOM_LENGTH, float(reachables[1].first) * this->ROOM_LENGTH};
+    this->powerenabler_coord = {float(reachables[2].second) * this->ROOM_LENGTH, float(reachables[2].first) * this->ROOM_LENGTH};
 }
 
 void MazeRenderer::openrightGate(int &row, int &col) {

@@ -49,16 +49,3 @@ void ButtonRenderer::DrawButton(Texture2D &texture) {
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     glBindVertexArray(0);
 }
-
-// bool ButtonRenderer::check_collision(vector<ObjectCoordinates> &walls) {
-//     for (auto wall : walls) {
-//         float x_dis = std::min(wall.topRight.first, this->current_coordinates.first + PLAYER_WIDTH) -
-//                       std::max(wall.bottomLeft.first, this->current_coordinates.first);
-//         float y_dis = std::min(wall.topRight.second, this->current_coordinates.second + PLAYER_HEIGTH) -
-//                       std::max(wall.bottomLeft.second, this->current_coordinates.second);
-//         if (x_dis >= 0 && y_dis >= 0) {
-//             return 1;
-//         }
-//     }
-//     return 0;
-// }
