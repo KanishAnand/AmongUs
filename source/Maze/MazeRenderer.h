@@ -13,7 +13,7 @@ class MazeRenderer {
     const int MAZE_WIDTH = 10;
     const float ROOM_LENGTH = 0.15;
 
-    pair<float, float> farthest_coord, button_coord;
+    pair<float, float> farthest_coord, button_coord, imposter_coord;
     glm::mat4 Model = glm::mat4(1.0f);
 
     vector<vector<MazeCell>> maze;

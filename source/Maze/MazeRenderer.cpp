@@ -229,6 +229,7 @@ void MazeRenderer::opencloseGates() {
     random_shuffle(reachables.begin(), reachables.end());
 
     this->button_coord = {float(reachables[0].second) * this->ROOM_LENGTH, float(reachables[0].first) * this->ROOM_LENGTH};
+    this->imposter_coord = {float(reachables[1].second) * this->ROOM_LENGTH, float(reachables[1].first) * this->ROOM_LENGTH};
 }
 
 void MazeRenderer::openrightGate(int &row, int &col) {

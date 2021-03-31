@@ -48,7 +48,7 @@ void Game::Init() {
     Player = new PlayerRenderer(shader_player, Maze->Model);
 
     auto shader_imposter = ResourceManager::GetShader("imposter");
-    Imposter = new ImposterRenderer(shader_imposter, Maze->farthest_coord, Maze->Model);
+    Imposter = new ImposterRenderer(shader_imposter, Maze->imposter_coord, Maze->Model);
 
     auto shader_hud = ResourceManager::GetShader("hud");
     HUD = new HUDRenderer(shader_hud, this->Height, this->Width);
@@ -107,14 +107,16 @@ void Game::ProcessInput(float dt) {
 }
 
 void Game::Render() {
-    if (Imposter->active && this->check_collision(Player->current_coordinates, Player->PLAYER_HEIGTH, Player->PLAYER_WIDTH,
-                                                  Imposter->current_coordinates, Imposter->IMPOSTER_HEIGHT, Imposter->IMPOSTER_WIDTH)) {
+    if (this->State == GAME_ACTIVE && this->totalTime == 0) {
+        this->State = GAME_LOOSE;
+    }
+
+    if (this->State == GAME_ACTIVE && Imposter->active && this->check_collision(Player->current_coordinates, Player->PLAYER_HEIGTH, Player->PLAYER_WIDTH, Imposter->current_coordinates, Imposter->IMPOSTER_HEIGHT, Imposter->IMPOSTER_WIDTH)) {
         this->State = GAME_LOOSE;
         Button->active = false;
     }
 
-    if (Button->active && this->check_collision(Player->current_coordinates, Player->PLAYER_HEIGTH, Player->PLAYER_WIDTH,
-                                                Button->coordinates, Button->OBJECT_HEIGHT, Button->OBJECT_WIDTH)) {
+    if (this->State == GAME_ACTIVE && Button->active && this->check_collision(Player->current_coordinates, Player->PLAYER_HEIGTH, Player->PLAYER_WIDTH, Button->coordinates, Button->OBJECT_HEIGHT, Button->OBJECT_WIDTH)) {
         // this->State = GAME_VAP;
         this->tasksCompleted++;
         Button->active = false;
@@ -146,8 +148,9 @@ void Game::Render() {
         Text->RenderText("Player Health: ", x, start + 2 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
         string taskStatus = "Tasks: " + to_string(this->tasksCompleted) + "/" + to_string(this->totalTasks);
         Text->RenderText(&taskStatus[0], x, start + 6 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
-        Text->RenderText("Lights: ", x, start + 10 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
-        Text->RenderText("Time: ", x, start + 14 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
+        Text->RenderText("Lights: On", x, start + 10 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
+        string timeStatus = "Time: " + to_string(this->totalTime);
+        Text->RenderText(timeStatus, x, start + 14 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
 
         //vapourizer button
         if (Button->active) {

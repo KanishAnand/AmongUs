@@ -64,6 +64,7 @@ int main(int argc, char* argv[]) {
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
 
+    int cnt = 0;
     while (!glfwWindowShouldClose(window)) {
         // calculate delta time
         float currentFrame = glfwGetTime();
@@ -83,6 +84,13 @@ int main(int argc, char* argv[]) {
         AmongUs.Render();
 
         glfwSwapBuffers(window);
+
+        if (cnt % 100 == 0) {
+            AmongUs.totalTime--;
+            AmongUs.totalTime = std::max(0, AmongUs.totalTime);
+            cnt = 0;
+        }
+        cnt++;
     }
 
     // delete all resources as loaded using the resource manager
