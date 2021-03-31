@@ -24,7 +24,7 @@ enum GameState {
 class Game {
    public:
     // game state
-    int countPlayer = 0, countImposter = 0, tasksCompleted = 0, totalTasks = 2, totalTime = 100, playerHealth = 100;
+    int countPlayer = 0, countImposter = 0, tasksCompleted = 0, totalTasks = 2, totalTime = 50, playerHealth = 100;
     GameState State;
     bool Keys[1024];
     bool KeysProcessed[1024];

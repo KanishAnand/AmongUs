@@ -149,11 +149,27 @@ void Game::ProcessInput(float dt) {
 
 void Game::Render() {
     if (this->State == GAME_LOOSE) {
-        TextFinal->RenderText("You Lose :(", this->Width / 4, this->Height / 2.9, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
+        float xx = float(this->Width) / 2.5, yy = float(this->Height) / float(2.7);
+        TextFinal->RenderText("You Lost :(", xx, yy, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
+        string healthStatuss = "Your Health: " + to_string(this->playerHealth);
+        Text->RenderText(healthStatuss, xx, yy + 100, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
+        string taskStatuss = "Tasks Completed: " + to_string(this->tasksCompleted) + "/" + to_string(this->totalTasks);
+        Text->RenderText(taskStatuss, xx, yy + 150, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
+        string timeLeft = "Time Left: " + to_string(this->totalTime);
+        Text->RenderText(timeLeft, xx, yy + 200, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
         return;
     }
 
     if (this->State == GAME_WIN) {
+        float xx = float(this->Width) / 2.5, yy = float(this->Height) / float(2.7);
+        TextFinal->RenderText("You Won :)", xx, yy, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
+        string healthStatuss = "Your Health: " + to_string(this->playerHealth);
+        Text->RenderText(healthStatuss, xx, yy + 100, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
+        string taskStatuss = "Tasks Completed: " + to_string(this->tasksCompleted) + "/" + to_string(this->totalTasks);
+        Text->RenderText(taskStatuss, xx, yy + 150, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
+        string timeLeft = "Time Left: " + to_string(this->totalTime);
+        Text->RenderText(timeLeft, xx, yy + 200, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
+        return;
         return;
     }
 
@@ -241,12 +257,12 @@ void Game::Render() {
     auto texture_hud = ResourceManager::GetTexture("hud");
     HUD->DrawHUD(texture_hud);
     float start = 0, offset = 10.0, x = 20.0;
-    string healthStatus = "Player Health: " + to_string(this->playerHealth);
+    string healthStatus = "Health: " + to_string(this->playerHealth);
     Text->RenderText(healthStatus, x, start + 2 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
-    string taskStatus = "Tasks: " + to_string(this->tasksCompleted) + "/" + to_string(this->totalTasks);
+    string taskStatus = "Tasks Completed: " + to_string(this->tasksCompleted) + "/" + to_string(this->totalTasks);
     Text->RenderText(&taskStatus[0], x, start + 6 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
     Text->RenderText("Lights: On", x, start + 10 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
-    string timeStatus = "Time: " + to_string(this->totalTime);
+    string timeStatus = "Time Left: " + to_string(this->totalTime);
     Text->RenderText(timeStatus, x, start + 14 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
 
     //vapourizer button

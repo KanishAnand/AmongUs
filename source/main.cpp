@@ -85,7 +85,7 @@ int main(int argc, char* argv[]) {
 
         glfwSwapBuffers(window);
 
-        if (cnt % 100 == 0) {
+        if (AmongUs.State == GAME_ACTIVE && cnt % 100 == 0) {
             AmongUs.totalTime--;
             AmongUs.totalTime = std::max(0, AmongUs.totalTime);
             cnt = 0;
