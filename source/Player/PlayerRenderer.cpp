@@ -47,6 +47,9 @@ void PlayerRenderer::DrawPlayer(Texture2D &texture) {
     }
 
     this->shader.SetMatrix4("model", model);
+    // this->shader.SetVector3f("lightColor", glm::vec3(0.0, 0.5, 0.0));
+    // this->shader.SetVector3f("lightPos", glm::vec3(0.0, 0.0, 0.0));
+    // this->shader.SetFloat("lightCutOff", 0.001);
 
     glActiveTexture(GL_TEXTURE0);
     texture.Bind();
