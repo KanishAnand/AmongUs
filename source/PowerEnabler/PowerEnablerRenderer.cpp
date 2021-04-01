@@ -44,7 +44,7 @@ void PowerEnablerRenderer::DrawPowerEnabler() {
 
     glm::mat4 model = this->Model;
 
-    this->shader.SetMatrix4("model", model);
+    this->shader.SetMatrix4("Model", model);
 
     glBindVertexArray(this->VAO);
     glDrawArrays(GL_TRIANGLES, 0, 3);

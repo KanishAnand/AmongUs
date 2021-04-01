@@ -10,6 +10,7 @@ class ButtonRenderer {
     bool active = true;
     float OBJECT_HEIGHT = 0.1;
     float OBJECT_WIDTH = 0.1;
+    Shader shader;
     glm::mat4 Model = glm::mat4(1.0f);
     pair<float, float> coordinates;
 
@@ -22,7 +23,6 @@ class ButtonRenderer {
 
    private:
     // Render state
-    Shader shader;
     unsigned int VAO;
     void initRenderData();
 };

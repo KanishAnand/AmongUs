@@ -9,6 +9,7 @@ class EndCellRenderer {
    public:
     bool active = false;
     int healthInc = 20;
+    Shader shader;
     float OBJECT_HEIGHT = 0.15;
     float OBJECT_WIDTH = 0.15;
     glm::mat4 Model = glm::mat4(1.0f);
@@ -23,7 +24,6 @@ class EndCellRenderer {
 
    private:
     // Render state
-    Shader shader;
     unsigned int VAO;
     void initRenderData();
 };

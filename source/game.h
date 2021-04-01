@@ -9,6 +9,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "shader_src/shader.h"
 #include "template.h"
 
 // Represents the current state of the game
@@ -18,16 +19,24 @@ enum GameState {
     GAME_LOOSE
 };
 
+enum LightState {
+    ON,
+    OFF
+};
+
 // Game holds all game-related state and functionality.
 // Combines all game-related data into a single class for
 // easy access to each of the components and manageability.
 class Game {
    public:
     // game state
+    int globalCount = 0;
     int countPlayer = 0, countImposter = 0, tasksCompleted = 0, totalTasks = 2, totalTime = 50, playerHealth = 100;
     GameState State;
     bool Keys[1024];
     bool KeysProcessed[1024];
+    LightState light = ON;
+    float lightoffDist = 0.25, lightonDist = 1000;
     unsigned int Width, Height;
     // constructor/destructor
     Game(unsigned int width, unsigned int height);
@@ -40,6 +49,7 @@ class Game {
     void Render();
     // reset
     void ResetPlayer();
+    void set_lighting(Shader &shader);
     // powerups
    private:
     bool check_collision(pair<float, float> &coord1, float h1, float w1, pair<float, float> &coord2, float h2, float w2);

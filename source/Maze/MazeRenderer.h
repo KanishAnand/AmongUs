@@ -13,6 +13,7 @@ class MazeRenderer {
     const int MAZE_WIDTH = 10;
     const float ROOM_LENGTH = 0.15;
 
+    Shader shader;
     int totalPowerups = 3, totalObstacles = 2;
 
     vector<pair<float, float>> powerup_coord, obstacle_coord;
@@ -35,7 +36,6 @@ class MazeRenderer {
 
    private:
     // Render state
-    Shader shader;
     vector<unsigned int> VAOS;
     void initRenderData();
     void initializeBuffers(int idx, pair<float, float> first, pair<float, float> second);

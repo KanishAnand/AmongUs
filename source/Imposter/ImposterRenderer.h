@@ -10,6 +10,7 @@ class ImposterRenderer {
    public:
     bool flip = 1, active = true;
     int healthDec = 1;
+    Shader shader;
     float IMPOSTER_SPEED = 0.005;
     float IMPOSTER_HEIGHT = 0.1;
     float IMPOSTER_WIDTH = 0.1;
@@ -28,7 +29,6 @@ class ImposterRenderer {
 
    private:
     // Render state
-    Shader shader;
     unsigned int VAO;
     void initRenderData();
     bool check_collision(vector<ObjectCoordinates> &walls);

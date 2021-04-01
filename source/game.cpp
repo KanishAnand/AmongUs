@@ -11,6 +11,7 @@
 #include "PowerUp/PowerUpRenderer.h"
 #include "TextRenderer.h"
 #include "resource_manager.h"
+#include "shader_src/shader.h"
 
 PlayerRenderer *Player;
 ImposterRenderer *Imposter;
@@ -34,15 +35,15 @@ Game::~Game() {
 
 void Game::Init() {
     // load shaders
-    ResourceManager::LoadShader("../source/Maze/shaders/vertex_shader.vert", "../source/Maze/shaders/fragment_shader.frag", nullptr, "maze");
-    ResourceManager::LoadShader("../source/Player/shaders/vertex_shader.vert", "../source/Player/shaders/fragment_shader.frag", nullptr, "player");
-    ResourceManager::LoadShader("../source/Imposter/shaders/vertex_shader.vert", "../source/Imposter/shaders/fragment_shader.frag", nullptr, "imposter");
+    ResourceManager::LoadShader("../source/shaders/color_shader/vertex_shader.vert", "../source/shaders/color_shader/fragment_shader.frag", nullptr, "maze");
+    ResourceManager::LoadShader("../source/shaders/texture_shader/vertex_shader.vert", "../source/shaders/texture_shader/fragment_shader.frag", nullptr, "player");
+    ResourceManager::LoadShader("../source/shaders/texture_shader/vertex_shader.vert", "../source/shaders/texture_shader/fragment_shader.frag", nullptr, "imposter");
     ResourceManager::LoadShader("../source/HUD/shaders/vertex_shader.vert", "../source/HUD/shaders/fragment_shader.frag", nullptr, "hud");
-    ResourceManager::LoadShader("../source/Button/shaders/vertex_shader.vert", "../source/Button/shaders/fragment_shader.frag", nullptr, "button");
-    ResourceManager::LoadShader("../source/PowerEnabler/shaders/vertex_shader.vert", "../source/PowerEnabler/shaders/fragment_shader.frag", nullptr, "powerenabler");
-    ResourceManager::LoadShader("../source/PowerUp/shaders/vertex_shader.vert", "../source/PowerUp/shaders/fragment_shader.frag", nullptr, "powerups");
-    ResourceManager::LoadShader("../source/Obstacle/shaders/vertex_shader.vert", "../source/Obstacle/shaders/fragment_shader.frag", nullptr, "obstacle");
-    ResourceManager::LoadShader("../source/EndCell/shaders/vertex_shader.vert", "../source/EndCell/shaders/fragment_shader.frag", nullptr, "endcell");
+    ResourceManager::LoadShader("../source/shaders/texture_shader/vertex_shader.vert", "../source/shaders/texture_shader/fragment_shader.frag", nullptr, "button");
+    ResourceManager::LoadShader("../source/shaders/color_shader/vertex_shader.vert", "../source/shaders/color_shader/fragment_shader.frag", nullptr, "powerenabler");
+    ResourceManager::LoadShader("../source/shaders/texture_shader/vertex_shader.vert", "../source/shaders/texture_shader/fragment_shader.frag", nullptr, "powerups");
+    ResourceManager::LoadShader("../source/shaders/texture_shader/vertex_shader.vert", "../source/shaders/texture_shader/fragment_shader.frag", nullptr, "obstacle");
+    ResourceManager::LoadShader("../source/shaders/texture_shader/vertex_shader.vert", "../source/shaders/texture_shader/fragment_shader.frag", nullptr, "endcell");
 
     ResourceManager::GetShader("player").Use().SetInteger("image", 0);
     ResourceManager::GetShader("imposter").Use().SetInteger("image", 0);
@@ -116,28 +117,62 @@ void Game::Update(float dt) {
 
 void Game::ProcessInput(float dt) {
     if (this->Keys[GLFW_KEY_UP]) {
-        this->countPlayer++;
+        if (this->globalCount % 10 == 1) {
+            this->countPlayer++;
+        }
         Player->move(UP, Maze->walls);
         this->KeysProcessed[GLFW_KEY_UP] = true;
     }
     if (this->Keys[GLFW_KEY_DOWN]) {
-        this->countPlayer++;
+        if (this->globalCount % 10 == 1) {
+            this->countPlayer++;
+        }
+
         Player->move(DOWN, Maze->walls);
         this->KeysProcessed[GLFW_KEY_DOWN] = true;
     }
     if (this->Keys[GLFW_KEY_LEFT]) {
-        this->countPlayer++;
+        if (this->globalCount % 10 == 1) {
+            this->countPlayer++;
+        }
+
         Player->move(LEFT, Maze->walls);
         this->KeysProcessed[GLFW_KEY_LEFT] = true;
     }
     if (this->Keys[GLFW_KEY_RIGHT]) {
-        this->countPlayer++;
+        if (this->globalCount % 10 == 1) {
+            this->countPlayer++;
+        }
+
         Player->move(RIGHT, Maze->walls);
         this->KeysProcessed[GLFW_KEY_RIGHT] = true;
+    }
+    if (this->Keys[GLFW_KEY_O] && !this->KeysProcessed[GLFW_KEY_O]) {
+        if (this->light == ON) {
+            this->light = OFF;
+        } else {
+            this->light = ON;
+        }
+        this->KeysProcessed[GLFW_KEY_O] = true;
+    }
+}
+
+void Game::set_lighting(Shader &shader) {
+    shader.Use();
+    shader.SetVector3f("lightColor", glm::vec3(1.0, 1.0, 1.0));
+    glm::vec4 lightCoord = vec4(Player->current_coordinates.first, Player->current_coordinates.second, 0.0, 1.0);
+    lightCoord = Maze->Model * lightCoord;
+    shader.SetVector3f("lightPos", vec3(lightCoord));
+    if (this->light == ON) {
+        shader.SetFloat("lightCutOff", this->lightonDist);
+    } else {
+        shader.SetFloat("lightCutOff", this->lightoffDist);
     }
 }
 
 void Game::Render() {
+    this->globalCount++;
+
     if (this->State == GAME_LOOSE) {
         float xx = float(this->Width) / 2.5, yy = float(this->Height) / float(2.7);
         TextFinal->RenderText("You Lost :(", xx, yy, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
@@ -189,6 +224,10 @@ void Game::Render() {
         }
     }
 
+    if (this->light == OFF && this->globalCount % 100 == 0) {
+        this->playerHealth++;
+    }
+
     if (this->State == GAME_ACTIVE && PowerEnabler->active && this->check_collision(Player->current_coordinates, Player->PLAYER_HEIGTH, Player->PLAYER_WIDTH, PowerEnabler->coordinates, PowerEnabler->OBJECT_HEIGHT, PowerEnabler->OBJECT_WIDTH)) {
         PowerEnabler->active = false;
         for (int i = 0; i < Maze->totalPowerups; i++) {
@@ -227,21 +266,26 @@ void Game::Render() {
         }
     }
 
+    set_lighting(Maze->shader);
     Maze->DrawMaze();
 
     int no = this->countPlayer % 4;
     string st = "player" + to_string(no);
     auto texture_player = ResourceManager::GetTexture(&st[0]);
+    set_lighting(Player->shader);
     Player->DrawPlayer(texture_player);
 
     if (Imposter->active) {
         int no2 = this->countImposter % 4;
         string st2 = "imposter" + to_string(no2);
         auto texture_imposter = ResourceManager::GetTexture(&st2[0]);
+        set_lighting(Imposter->shader);
         Imposter->DrawImposter(texture_imposter);
 
         Imposter->move(Player->current_coordinates, Maze->ROOM_LENGTH, Maze->MAZE_WIDTH, Maze->nearestCell);
-        this->countImposter++;
+        if (this->globalCount % 10 == 0) {
+            this->countImposter++;
+        }
     }
 
     // Heads Up Display
@@ -252,23 +296,32 @@ void Game::Render() {
     Text->RenderText(healthStatus, x, start + 2 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
     string taskStatus = "Tasks Completed: " + to_string(this->tasksCompleted) + "/" + to_string(this->totalTasks);
     Text->RenderText(&taskStatus[0], x, start + 6 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
-    Text->RenderText("Lights: On", x, start + 10 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
+    string lightStatus = "Lights: ";
+    if (this->light == ON) {
+        lightStatus += "ON";
+    } else {
+        lightStatus += "OFF";
+    }
+    Text->RenderText(lightStatus, x, start + 10 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
     string timeStatus = "Time Left: " + to_string(this->totalTime);
     Text->RenderText(timeStatus, x, start + 14 * offset, 1.0f, glm::vec3(0.0f, 0.5f, 0.0f));
 
     //vapourizer button
     if (Button->active) {
         auto texture_button = ResourceManager::GetTexture("button");
+        set_lighting(Button->shader);
         Button->DrawButton(texture_button);
     }
 
     if (PowerEnabler->active) {
+        set_lighting(PowerEnabler->shader);
         PowerEnabler->DrawPowerEnabler();
     }
 
     for (int i = 0; i < Maze->totalPowerups; i++) {
         if (PowerUps[i]->active) {
             auto texture_powerups = ResourceManager::GetTexture("powerups");
+            set_lighting(PowerUps[i]->shader);
             PowerUps[i]->DrawPowerUp(texture_powerups);
         }
     }
@@ -276,12 +329,16 @@ void Game::Render() {
     for (int i = 0; i < Maze->totalObstacles; i++) {
         if (Obstacles[i]->active) {
             auto texture_obstacle = ResourceManager::GetTexture("obstacles");
+            set_lighting(Obstacles[i]->shader);
             Obstacles[i]->DrawObstacle(texture_obstacle);
         }
     }
 
     auto texture_endcell = ResourceManager::GetTexture("endcell");
-    EndCell->DrawEndCell(texture_endcell);
+    set_lighting(EndCell->shader);
+    if (this->tasksCompleted == 2) {
+        EndCell->DrawEndCell(texture_endcell);
+    }
 }
 
 bool Game::check_collision(pair<float, float> &coord1, float h1, float w1, pair<float, float> &coord2, float h2, float w2) {
