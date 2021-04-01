@@ -7,14 +7,16 @@ uniform sampler2D sprite;
 
 uniform vec3 lightColor;
 uniform vec3 lightPos;
-uniform float lightCutOff;
+uniform int light;
 
 void main()
 {
     float distance = length(FragPos - lightPos);
 
-    if(distance < lightCutOff)
-        color = vec4(lightColor, 1.0) * texture(sprite, TexCoords);
-    else
-        color = vec4(0.3 * lightColor, 1.0) * texture(sprite, TexCoords);
+    if(light == 0){
+        color = vec4(lightColor*(0.2/distance), 1.0) * texture(sprite, TexCoords);
+    }
+    else{
+        color = texture(sprite, TexCoords);
+    }
 }

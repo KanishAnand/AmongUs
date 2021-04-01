@@ -93,7 +93,7 @@ void Game::Init() {
     EndCell = new EndCellRenderer(shader_endcell, Maze->Model, Maze->farthest_coord);
 
     //Load texture
-    ResourceManager::LoadTexture("../source/HUD/texture/download.jpg", true, "hud");
+    ResourceManager::LoadTexture("../source/HUD/texture/texture.jpg", true, "hud");
     ResourceManager::LoadTexture("../source/Player/sprites/0.png", true, "player0");
     ResourceManager::LoadTexture("../source/Player/sprites/1.png", true, "player1");
     ResourceManager::LoadTexture("../source/Player/sprites/2.png", true, "player2");
@@ -164,9 +164,9 @@ void Game::set_lighting(Shader &shader) {
     lightCoord = Maze->Model * lightCoord;
     shader.SetVector3f("lightPos", vec3(lightCoord));
     if (this->light == ON) {
-        shader.SetFloat("lightCutOff", this->lightonDist);
+        shader.SetInteger("light", 1);
     } else {
-        shader.SetFloat("lightCutOff", this->lightoffDist);
+        shader.SetInteger("light", 0);
     }
 }
 

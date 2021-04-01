@@ -6,14 +6,16 @@ in vec3 ourColor;
 
 uniform vec3 lightColor;
 uniform vec3 lightPos;
-uniform float lightCutOff;
+uniform int light;
 
 void main() {
     FragColor = vec4(ourColor, 1.0f);
     float distance = length(FragPos - lightPos);
 
-    if(distance < lightCutOff)
-        FragColor = vec4(ourColor * lightColor, 1.0);
-    else
-        FragColor = vec4(0.3 * ourColor * lightColor, 1.0);
+    if(light == 0){
+        FragColor = vec4(ourColor * lightColor * (0.2/distance), 1.0);
+    }
+    else{
+        FragColor = vec4(ourColor, 1.0);
+    }
 }

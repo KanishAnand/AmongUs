@@ -36,7 +36,6 @@ class Game {
     bool Keys[1024];
     bool KeysProcessed[1024];
     LightState light = ON;
-    float lightoffDist = 0.25, lightonDist = 1000;
     unsigned int Width, Height;
     // constructor/destructor
     Game(unsigned int width, unsigned int height);
