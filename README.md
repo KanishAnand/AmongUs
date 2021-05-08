@@ -1,37 +1,24 @@
-# 2-D-Maze-Game
+# AmongUS
 
-## INSTALLATION INSTRUCTIONS
+This is a 2D Maze game where an enemy always follows you. Target is to collect all power ups and exit the maze before enemy finishes you. You can press kill button to destroy enemy.Exit door appears once you take all power ups. Game is made using [OpenGL](https://www.opengl.org//).
 
-- Type following commands:
-    ```
-    sudo apt-get install build-essential
-    sudo apt install xorg-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev
-    sudo apt-get install libfreetype-dev libfreetype6 libfreetype6-dev
-    pkg-config --cflags freetype2
-    ```
+![img](images/display.jpg)
+![img](images/exit.png)
 
-- Install `cmake`
-    ```
-    sudo apt install cmake
-    ```
+## Run
 
-- Run following commands:
+- mkdir build && cd build
+- cmake ../
+- make
+- ./amongus
 
-    ```
-    mkdir build
-    cd build
-    cmake ..
-    make
-    ./2-D-Maze-Game
-    ```
+## Keys
 
-## HOW TO RUN
+- Keys to move the player.
 
-1. 4 Keys to move the player.
-    - W - Top
-    - S - Bottom
-    - A - Left
-    - D - Right
+  - ArrowUp
+  - ArrowDown
+  - ArrowLeft
+  - ArrowRight
 
-2. 1 Key to toggle light.
-    - L - toggles light
+- O: Switch On/Off Lights
